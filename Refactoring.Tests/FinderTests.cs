@@ -7,16 +7,16 @@ namespace Refactoring.Tests
     public class FinderTests
     {
         [Theory]
-        [MemberData(nameof(FinderTestData.ResultsPlus), MemberType = typeof(FinderTestData))]
-        [MemberData(nameof(FinderTestData.ResultsMinus), MemberType = typeof(FinderTestData))]
-        [MemberData(nameof(FinderTestData.ResultsEmpty), MemberType = typeof(FinderTestData))]
-        public void TestFinder(PT pt, List<Result> results, P expected)
+        [MemberData(nameof(FinderTestData.PersonsWithMaxDateDifferenceType), MemberType = typeof(FinderTestData))]
+        [MemberData(nameof(FinderTestData.PersonsWithMinDateDifferenceType), MemberType = typeof(FinderTestData))]
+        [MemberData(nameof(FinderTestData.PersonsWithLessThanTwoRecords), MemberType = typeof(FinderTestData))]
+        public void TestFinder(DateDifferenceType dateDifferenceType, List<Person> persons, FinderResult expected)
         {
             // Arrange
-            var finder = new Finder(results);
+            var finder = new Finder(persons);
 
             // Act
-            var actual = finder.Find(pt); 
+            var actual = finder.Find(dateDifferenceType); 
 
             // Assert
             Assert.Equal(expected, actual);
@@ -25,131 +25,131 @@ namespace Refactoring.Tests
 
     public class FinderTestData
     {
-        public static IEnumerable<object[]> ResultsPlus => new List<object[]>
+        public static IEnumerable<object[]> PersonsWithMaxDateDifferenceType => new List<object[]>
         {
             new object[] 
             { 
-                PT.Plus, 
-                new List<Result>
+                DateDifferenceType.Max, 
+                new List<Person>
                 {
-                    new() { Name = "Name1", DoB = new DateTime(2022, 10, 10) },
-                    new() { Name = "Name2", DoB = new DateTime(2022,  6,  4) },
+                    new() { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
+                    new() { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                 },
-                new P
+                new FinderResult
                 {
-                    P1 = new Result { Name = "Name2", DoB = new DateTime(2022,  6,  4) },
-                    P2 = new Result { Name = "Name1", DoB = new DateTime(2022, 10, 10) },
-                    D = new DateTime(2022, 10, 10) - new DateTime(2022,  6,  4)
+                    Person1 = new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
+                    Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
+                    DateOfBirthDifference = new DateTime(2022, 10, 10) - new DateTime(2022,  6,  4)
                 }
             },
             new object[] 
             { 
-                PT.Plus, 
-                new List<Result>
+                DateDifferenceType.Max, 
+                new List<Person>
                 {
-                    new() { Name = "Name1", DoB = new DateTime(2018, 10, 10) },
-                    new() { Name = "Name2", DoB = new DateTime(2021,  6,  4) },
-                    new() { Name = "Name3", DoB = new DateTime(2022, 12, 31) },
-                    new() { Name = "Name4", DoB = new DateTime(2022,  5, 13) },
-                    new() { Name = "Name5", DoB = new DateTime(2018, 10, 10) },
-                    new() { Name = "Name6", DoB = new DateTime(2022, 12, 31) },
+                    new() { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) },
+                    new() { Name = "Name2", DateOfBirth = new DateTime(2021,  6,  4) },
+                    new() { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
+                    new() { Name = "Name4", DateOfBirth = new DateTime(2022,  5, 13) },
+                    new() { Name = "Name5", DateOfBirth = new DateTime(2018, 10, 10) },
+                    new() { Name = "Name6", DateOfBirth = new DateTime(2022, 12, 31) },
                 },
-                new P
+                new FinderResult
                 {
-                    P1 = new Result { Name = "Name1", DoB = new DateTime(2018, 10, 10) },
-                    P2 = new Result { Name = "Name3", DoB = new DateTime(2022, 12, 31) },
-                    D = new DateTime(2022, 12, 31) - new DateTime(2018, 10, 10)
+                    Person1 = new Person { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) },
+                    Person2 = new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
+                    DateOfBirthDifference = new DateTime(2022, 12, 31) - new DateTime(2018, 10, 10)
                 }
             },
             new object[] 
             { 
-                PT.Plus, 
-                new List<Result>
+                DateDifferenceType.Max, 
+                new List<Person>
                 {
-                    new() { Name = "Name1", DoB = DateTime.MinValue },
-                    new() { Name = "Name2", DoB = DateTime.Now },
-                    new() { Name = "Name3", DoB = DateTime.MaxValue },
+                    new() { Name = "Name1", DateOfBirth = DateTime.MinValue },
+                    new() { Name = "Name2", DateOfBirth = DateTime.Now },
+                    new() { Name = "Name3", DateOfBirth = DateTime.MaxValue },
                 },
-                new P
+                new FinderResult
                 {
-                    P1 = new Result { Name = "Name1", DoB = DateTime.MinValue },
-                    P2 = new Result { Name = "Name3", DoB = DateTime.MaxValue },
-                    D = DateTime.MaxValue - DateTime.MinValue
+                    Person1 = new Person { Name = "Name1", DateOfBirth = DateTime.MinValue },
+                    Person2 = new Person { Name = "Name3", DateOfBirth = DateTime.MaxValue },
+                    DateOfBirthDifference = DateTime.MaxValue - DateTime.MinValue
                 }
             }
         };
 
-        public static IEnumerable<object[]> ResultsMinus => new List<object[]>
+        public static IEnumerable<object[]> PersonsWithMinDateDifferenceType => new List<object[]>
         {
             new object[] 
             { 
-                PT.Minus, 
-                new List<Result>
+                DateDifferenceType.Min, 
+                new List<Person>
                 {
-                    new() { Name = "Name1", DoB = new DateTime(2022, 10, 10) },
-                    new() { Name = "Name2", DoB = new DateTime(2022,  6,  4) },
+                    new() { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
+                    new() { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                 },
-                new P
+                new FinderResult
                 {
-                    P1 = new Result { Name = "Name2", DoB = new DateTime(2022,  6,  4) },
-                    P2 = new Result { Name = "Name1", DoB = new DateTime(2022, 10, 10) },
-                    D = new DateTime(2022, 10, 10) - new DateTime(2022,  6,  4)
+                    Person1 = new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
+                    Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
+                    DateOfBirthDifference = new DateTime(2022, 10, 10) - new DateTime(2022,  6,  4)
                 }
             },
             new object[] 
             { 
-                PT.Minus, 
-                new List<Result>
+                DateDifferenceType.Min, 
+                new List<Person>
                 {
-                    new() { Name = "Name1", DoB = new DateTime(2022, 12, 31) },
-                    new() { Name = "Name2", DoB = new DateTime(2021,  6,  4) },
-                    new() { Name = "Name3", DoB = new DateTime(2022, 12, 31) },
-                    new() { Name = "Name4", DoB = new DateTime(2022,  5, 13) },
-                    new() { Name = "Name5", DoB = new DateTime(2018, 10, 10) },
-                    new() { Name = "Name6", DoB = new DateTime(2022, 12, 31) },
+                    new() { Name = "Name1", DateOfBirth = new DateTime(2022, 12, 31) },
+                    new() { Name = "Name2", DateOfBirth = new DateTime(2021,  6,  4) },
+                    new() { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
+                    new() { Name = "Name4", DateOfBirth = new DateTime(2022,  5, 13) },
+                    new() { Name = "Name5", DateOfBirth = new DateTime(2018, 10, 10) },
+                    new() { Name = "Name6", DateOfBirth = new DateTime(2022, 12, 31) },
                 },
-                new P
+                new FinderResult
                 {
-                    P1 = new Result { Name = "Name3", DoB = new DateTime(2022, 12, 31) },
-                    P2 = new Result { Name = "Name1", DoB = new DateTime(2022, 12, 31) },
-                    D = TimeSpan.Zero
+                    Person1 = new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
+                    Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 12, 31) },
+                    DateOfBirthDifference = TimeSpan.Zero
                 }
             },
             new object[] 
             { 
-                PT.Minus, 
-                new List<Result>
+                DateDifferenceType.Min, 
+                new List<Person>
                 {
-                    new() { Name = "Name1", DoB = DateTime.MinValue },
-                    new() { Name = "Name2", DoB = DateTime.MaxValue },
-                    new() { Name = "Name3", DoB = DateTime.Now },
-                    new() { Name = "Name4", DoB = DateTime.MaxValue },
+                    new() { Name = "Name1", DateOfBirth = DateTime.MinValue },
+                    new() { Name = "Name2", DateOfBirth = DateTime.MaxValue },
+                    new() { Name = "Name3", DateOfBirth = DateTime.Now },
+                    new() { Name = "Name4", DateOfBirth = DateTime.MaxValue },
                 },
-                new P
+                new FinderResult
                 {
-                    P1 = new Result { Name = "Name4", DoB = DateTime.MaxValue },
-                    P2 = new Result { Name = "Name2", DoB = DateTime.MaxValue },
-                    D = TimeSpan.Zero
+                    Person1 = new Person { Name = "Name4", DateOfBirth = DateTime.MaxValue },
+                    Person2 = new Person { Name = "Name2", DateOfBirth = DateTime.MaxValue },
+                    DateOfBirthDifference = TimeSpan.Zero
                 }
             }
         };
 
-        public static IEnumerable<object[]> ResultsEmpty => new List<object[]>
+        public static IEnumerable<object[]> PersonsWithLessThanTwoRecords => new List<object[]>
         {
             new object[] 
             { 
-                PT.Plus, 
-                new List<Result>(),
-                new P()
+                DateDifferenceType.Max, 
+                new List<Person>(),
+                new FinderResult()
             },
             new object[] 
             { 
-                PT.Minus, 
-                new List<Result>
+                DateDifferenceType.Min, 
+                new List<Person>
                 {
-                    new() { Name = "Name1", DoB = new DateTime(2018, 10, 10) }
+                    new() { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) }
                 },
-                new P()
+                new FinderResult()
             }
         };
     }

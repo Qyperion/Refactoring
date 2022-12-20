@@ -2,29 +2,29 @@
 
 namespace Refactoring
 {
-    public class Result
+    public class Person
     {
         public string Name { get; set; }
-        public DateTime DoB { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(this, obj))
                 return true;
 
-            return obj != null && Equals(obj as Result);
+            return obj != null && Equals(obj as Person);
         }
 
-        public bool Equals(Result other)
+        public bool Equals(Person other)
         {
             return other != null
                 && Name == other.Name 
-                && DoB.Equals(other.DoB);
+                && DateOfBirth.Equals(other.DateOfBirth);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, DoB);
+            return HashCode.Combine(Name, DateOfBirth);
         }
     }
 }

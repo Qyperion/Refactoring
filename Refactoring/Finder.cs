@@ -1,68 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Refactoring
 {
     public class Finder
     {
-        private readonly List<Result> _p;
+        private readonly List<Person> _persons;
 
-        public Finder(List<Result> p)
+        public Finder(List<Person> persons)
         {
-            _p = p;
+            _persons = persons;
         }
 
-        public P Find(PT pt)
+        public FinderResult Find(DateDifferenceType dateDifferenceType)
         {
-            var ps = new List<P>();
+            var results = new List<FinderResult>();
 
-            for(var i = 0; i < _p.Count - 1; i++)
+            for(var i = 0; i < _persons.Count - 1; i++)
             {
-                for(var j = i + 1; j < _p.Count; j++)
+                for(var j = i + 1; j < _persons.Count; j++)
                 {
-                    var p = new P();
-                    if(_p[i].DoB < _p[j].DoB)
+                    var result = new FinderResult();
+                    if(_persons[i].DateOfBirth < _persons[j].DateOfBirth)
                     {
-                        p.P1 = _p[i];
-                        p.P2 = _p[j];
+                        result.Person1 = _persons[i];
+                        result.Person2 = _persons[j];
                     }
                     else
                     {
-                        p.P1 = _p[j];
-                        p.P2 = _p[i];
+                        result.Person1 = _persons[j];
+                        result.Person2 = _persons[i];
                     }
-                    p.D = p.P2.DoB - p.P1.DoB;
-                    ps.Add(p);
+                    result.DateOfBirthDifference = result.Person2.DateOfBirth - result.Person1.DateOfBirth;
+                    results.Add(result);
                 }
             }
 
-            if(ps.Count < 1)
+            if(results.Count < 1)
             {
-                return new P();
+                return new FinderResult();
             }
 
-            var temp = ps[0];
-            for(var i = 0; i < ps.Count; i++)
+            var extremumResult  = results[0];
+            for(var i = 0; i < results.Count; i++)
             {
-                switch(pt)
+                switch(dateDifferenceType)
                 {
-                    case PT.Minus:
-                        if(ps[i].D < temp.D)
+                    case DateDifferenceType.Min:
+                        if(results[i].DateOfBirthDifference < extremumResult.DateOfBirthDifference)
                         {
-                            temp = ps[i];
+                            extremumResult = results[i];
                         }
                         break;
 
-                    case PT.Plus:
-                        if(ps[i].D > temp.D)
+                    case DateDifferenceType.Max:
+                        if(results[i].DateOfBirthDifference > extremumResult.DateOfBirthDifference)
                         {
-                            temp = ps[i];
+                            extremumResult = results[i];
                         }
                         break;
                 }
             }
 
-            return temp;
+            return extremumResult;
         }
     }
 }
