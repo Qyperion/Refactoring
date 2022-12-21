@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Refactoring.Enums;
+using Refactoring.Finders;
 using Refactoring.Models;
 using Xunit;
 
@@ -12,10 +13,10 @@ namespace Refactoring.Tests
         [MemberData(nameof(FinderTestData.PersonsWithMaxDateDifferenceType), MemberType = typeof(FinderTestData))]
         [MemberData(nameof(FinderTestData.PersonsWithMinDateDifferenceType), MemberType = typeof(FinderTestData))]
         [MemberData(nameof(FinderTestData.PersonsWithLessThanTwoRecords), MemberType = typeof(FinderTestData))]
-        public void TestPersonsFinder(DateDifferenceType dateDifferenceType, List<Person> persons, PersonFinderResult expected)
+        public void TestPersonDatesFinder(DateDifferenceType dateDifferenceType, List<Person> persons, FinderResult<Person> expected)
         {
             // Arrange
-            var finder = new PersonsFinder(persons);
+            var finder = new PersonDatesFinder(persons);
 
             // Act
             var actual = finder.Find(dateDifferenceType);
@@ -23,8 +24,25 @@ namespace Refactoring.Tests
             // Assert
             Assert.Equal(expected, actual);
 
-            if (actual.Person1 != null && actual.Person2 != null)
-                Assert.Equal(actual.DateOfBirthDifference, actual.Person2.DateOfBirth - actual.Person1.DateOfBirth);
+            if (actual.Element1 != null && actual.Element2 != null)
+                Assert.Equal(actual.DateDifference, actual.Element2.DateOfBirth - actual.Element1.DateOfBirth);
+        }
+
+        [Theory]
+        [MemberData(nameof(FinderTestData.CompaniesTestData), MemberType = typeof(FinderTestData))]
+        public void TestCompanyDatesFinder(DateDifferenceType dateDifferenceType, List<Company> companies, FinderResult<Company> expected)
+        {
+            // Arrange
+            var finder = new CompanyDatesFinder(companies);
+
+            // Act
+            var actual = finder.Find(dateDifferenceType);
+
+            // Assert
+            Assert.Equal(expected, actual);
+
+            if (actual.Element1 != null && actual.Element2 != null)
+                Assert.Equal(actual.DateDifference, actual.Element2.DateOfFoundation - actual.Element1.DateOfFoundation);
         }
     }
 
@@ -40,7 +58,7 @@ namespace Refactoring.Tests
                     new() { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
                     new() { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                 },
-                new PersonFinderResult
+                new FinderResult<Person>
                 (
                     new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                     new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) }
@@ -59,7 +77,7 @@ namespace Refactoring.Tests
                     new() { Name = "Name5", DateOfBirth = new DateTime(2018, 10, 10) },
                     new() { Name = "Name6", DateOfBirth = new DateTime(2022, 12, 31) },
                 },
-                new PersonFinderResult
+                new FinderResult<Person>
                 (
                     new Person { Name = "Name0", DateOfBirth = new DateTime(2018, 10, 10) },
                     new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) }
@@ -74,7 +92,7 @@ namespace Refactoring.Tests
                     new() { Name = "Name2", DateOfBirth = DateTime.Now },
                     new() { Name = "Name3", DateOfBirth = DateTime.MaxValue },
                 },
-                new PersonFinderResult
+                new FinderResult<Person>
                 (
                     new Person { Name = "Name1", DateOfBirth = DateTime.MinValue },
                     new Person { Name = "Name3", DateOfBirth = DateTime.MaxValue }
@@ -92,7 +110,7 @@ namespace Refactoring.Tests
                     new() { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
                     new() { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                 },
-                new PersonFinderResult
+                new FinderResult<Person>
                 (
                     new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                     new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) }
@@ -110,7 +128,7 @@ namespace Refactoring.Tests
                     new() { Name = "Name5", DateOfBirth = new DateTime(2018, 10, 10) },
                     new() { Name = "Name6", DateOfBirth = new DateTime(2022, 12, 31) },
                 },
-                new PersonFinderResult
+                new FinderResult<Person>
                 (
                     new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
                     new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 12, 31) }
@@ -126,7 +144,7 @@ namespace Refactoring.Tests
                     new() { Name = "Name3", DateOfBirth = DateTime.Now },
                     new() { Name = "Name4", DateOfBirth = DateTime.MaxValue },
                 },
-                new PersonFinderResult
+                new FinderResult<Person>
                 (
                     new Person { Name = "Name4", DateOfBirth = DateTime.MaxValue },
                     new Person { Name = "Name2", DateOfBirth = DateTime.MaxValue }
@@ -140,7 +158,7 @@ namespace Refactoring.Tests
             { 
                 DateDifferenceType.Max, 
                 new List<Person>(),
-                new PersonFinderResult()
+                new FinderResult<Person>()
             },
             new object[] 
             { 
@@ -149,7 +167,59 @@ namespace Refactoring.Tests
                 {
                     new() { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) }
                 },
-                new PersonFinderResult()
+                new FinderResult<Person>()
+            }
+        };
+
+        public static IEnumerable<object[]> CompaniesTestData => new List<object[]>
+        {
+            new object[]
+            {
+                DateDifferenceType.Max,
+                new List<Company>
+                {
+                    new() { Name = "Microsoft",  DateOfFoundation = new DateTime(1975, 4, 4) },
+                    new() { Name = "Apple Inc.", DateOfFoundation = new DateTime(1976, 4, 1) },
+                },
+                new FinderResult<Company>
+                (
+                    new Company { Name = "Microsoft",  DateOfFoundation = new DateTime(1975, 4, 4) },
+                    new Company { Name = "Apple Inc.", DateOfFoundation = new DateTime(1976, 4, 1) }
+                )
+            },
+            new object[] 
+            { 
+                DateDifferenceType.Max, 
+                new List<Company>
+                {
+                    new() { Name = "Siemens",     DateOfFoundation = new DateTime(1847, 10, 1) },
+                    new() { Name = "Rand Inc.",   DateOfFoundation = new DateTime(1847, 10, 1) },
+                    new() { Name = "Microsoft",   DateOfFoundation = new DateTime(1975,  4, 4) },
+                    new() { Name = "Xiaomi",      DateOfFoundation = new DateTime(2010,  4, 6) },
+                    new() { Name = "Apple Inc.",  DateOfFoundation = new DateTime(1976,  4, 1) },
+                    new() { Name = "Tesla, Inc.", DateOfFoundation = new DateTime(2003,  7, 1) },
+                },
+                new FinderResult<Company>
+                (
+                    new Company { Name = "Siemens", DateOfFoundation = new DateTime(1847, 10, 1) },
+                    new Company { Name = "Xiaomi",  DateOfFoundation = new DateTime(2010,  4, 6) }
+                )
+            },
+            new object[] 
+            { 
+                DateDifferenceType.Min, 
+                new List<Company>
+                {
+                    new() { Name = "Siemens",     DateOfFoundation = new DateTime(1847, 10, 1) },
+                    new() { Name = "Xiaomi",      DateOfFoundation = new DateTime(2010,  4, 6) },
+                    new() { Name = "Tesla, Inc.", DateOfFoundation = new DateTime(2003,  7, 1) },
+                    new() { Name = "Rand Inc.",   DateOfFoundation = new DateTime(2010,  4, 6) },
+                },
+                new FinderResult<Company>
+                (
+                    new Company { Name = "Rand Inc.", DateOfFoundation = new DateTime(2010, 4, 6) },
+                    new Company { Name = "Xiaomi",    DateOfFoundation = new DateTime(2010, 4, 6) }
+                )
             }
         };
     }
