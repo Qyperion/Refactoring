@@ -12,16 +12,19 @@ namespace Refactoring.Tests
         [MemberData(nameof(FinderTestData.PersonsWithMaxDateDifferenceType), MemberType = typeof(FinderTestData))]
         [MemberData(nameof(FinderTestData.PersonsWithMinDateDifferenceType), MemberType = typeof(FinderTestData))]
         [MemberData(nameof(FinderTestData.PersonsWithLessThanTwoRecords), MemberType = typeof(FinderTestData))]
-        public void TestFinder(DateDifferenceType dateDifferenceType, List<Person> persons, FinderResult expected)
+        public void TestPersonsFinder(DateDifferenceType dateDifferenceType, List<Person> persons, PersonFinderResult expected)
         {
             // Arrange
-            var finder = new Finder(persons);
+            var finder = new PersonsFinder(persons);
 
             // Act
-            var actual = finder.Find(dateDifferenceType); 
+            var actual = finder.Find(dateDifferenceType);
 
             // Assert
             Assert.Equal(expected, actual);
+
+            if (actual.Person1 != null && actual.Person2 != null)
+                Assert.Equal(actual.DateOfBirthDifference, actual.Person2.DateOfBirth - actual.Person1.DateOfBirth);
         }
     }
 
@@ -29,25 +32,26 @@ namespace Refactoring.Tests
     {
         public static IEnumerable<object[]> PersonsWithMaxDateDifferenceType => new List<object[]>
         {
-            new object[] 
-            { 
-                DateDifferenceType.Max, 
+            new object[]
+            {
+                DateDifferenceType.Max,
                 new List<Person>
                 {
                     new() { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
                     new() { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                 },
-                new FinderResult
-                {
-                    Person1 = new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
-                    Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
-                }
+                new PersonFinderResult
+                (
+                    new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
+                    new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) }
+                )
             },
             new object[] 
             { 
                 DateDifferenceType.Max, 
                 new List<Person>
                 {
+                    new() { Name = "Name0", DateOfBirth = new DateTime(2018, 10, 10) },
                     new() { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) },
                     new() { Name = "Name2", DateOfBirth = new DateTime(2021,  6,  4) },
                     new() { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
@@ -55,11 +59,11 @@ namespace Refactoring.Tests
                     new() { Name = "Name5", DateOfBirth = new DateTime(2018, 10, 10) },
                     new() { Name = "Name6", DateOfBirth = new DateTime(2022, 12, 31) },
                 },
-                new FinderResult
-                {
-                    Person1 = new Person { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) },
-                    Person2 = new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
-                }
+                new PersonFinderResult
+                (
+                    new Person { Name = "Name0", DateOfBirth = new DateTime(2018, 10, 10) },
+                    new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) }
+                )
             },
             new object[] 
             { 
@@ -70,29 +74,29 @@ namespace Refactoring.Tests
                     new() { Name = "Name2", DateOfBirth = DateTime.Now },
                     new() { Name = "Name3", DateOfBirth = DateTime.MaxValue },
                 },
-                new FinderResult
-                {
-                    Person1 = new Person { Name = "Name1", DateOfBirth = DateTime.MinValue },
-                    Person2 = new Person { Name = "Name3", DateOfBirth = DateTime.MaxValue },
-                }
+                new PersonFinderResult
+                (
+                    new Person { Name = "Name1", DateOfBirth = DateTime.MinValue },
+                    new Person { Name = "Name3", DateOfBirth = DateTime.MaxValue }
+                )
             }
         };
 
         public static IEnumerable<object[]> PersonsWithMinDateDifferenceType => new List<object[]>
         {
-            new object[] 
-            { 
-                DateDifferenceType.Min, 
+            new object[]
+            {
+                DateDifferenceType.Min,
                 new List<Person>
                 {
                     new() { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
                     new() { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                 },
-                new FinderResult
-                {
-                    Person1 = new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
-                    Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
-                }
+                new PersonFinderResult
+                (
+                    new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
+                    new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) }
+                )
             },
             new object[] 
             { 
@@ -106,11 +110,11 @@ namespace Refactoring.Tests
                     new() { Name = "Name5", DateOfBirth = new DateTime(2018, 10, 10) },
                     new() { Name = "Name6", DateOfBirth = new DateTime(2022, 12, 31) },
                 },
-                new FinderResult
-                {
-                    Person1 = new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
-                    Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 12, 31) },
-                }
+                new PersonFinderResult
+                (
+                    new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
+                    new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 12, 31) }
+                )
             },
             new object[] 
             { 
@@ -122,11 +126,11 @@ namespace Refactoring.Tests
                     new() { Name = "Name3", DateOfBirth = DateTime.Now },
                     new() { Name = "Name4", DateOfBirth = DateTime.MaxValue },
                 },
-                new FinderResult
-                {
-                    Person1 = new Person { Name = "Name4", DateOfBirth = DateTime.MaxValue },
-                    Person2 = new Person { Name = "Name2", DateOfBirth = DateTime.MaxValue },
-                }
+                new PersonFinderResult
+                (
+                    new Person { Name = "Name4", DateOfBirth = DateTime.MaxValue },
+                    new Person { Name = "Name2", DateOfBirth = DateTime.MaxValue }
+                )
             }
         };
 
@@ -136,7 +140,7 @@ namespace Refactoring.Tests
             { 
                 DateDifferenceType.Max, 
                 new List<Person>(),
-                new FinderResult()
+                new PersonFinderResult()
             },
             new object[] 
             { 
@@ -145,7 +149,7 @@ namespace Refactoring.Tests
                 {
                     new() { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) }
                 },
-                new FinderResult()
+                new PersonFinderResult()
             }
         };
     }
