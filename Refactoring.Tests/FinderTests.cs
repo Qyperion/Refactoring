@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Refactoring.Enums;
+using Refactoring.Models;
 using Xunit;
 
 namespace Refactoring.Tests
@@ -39,7 +41,6 @@ namespace Refactoring.Tests
                 {
                     Person1 = new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                     Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
-                    DateOfBirthDifference = new DateTime(2022, 10, 10) - new DateTime(2022,  6,  4)
                 }
             },
             new object[] 
@@ -58,7 +59,6 @@ namespace Refactoring.Tests
                 {
                     Person1 = new Person { Name = "Name1", DateOfBirth = new DateTime(2018, 10, 10) },
                     Person2 = new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
-                    DateOfBirthDifference = new DateTime(2022, 12, 31) - new DateTime(2018, 10, 10)
                 }
             },
             new object[] 
@@ -74,7 +74,6 @@ namespace Refactoring.Tests
                 {
                     Person1 = new Person { Name = "Name1", DateOfBirth = DateTime.MinValue },
                     Person2 = new Person { Name = "Name3", DateOfBirth = DateTime.MaxValue },
-                    DateOfBirthDifference = DateTime.MaxValue - DateTime.MinValue
                 }
             }
         };
@@ -93,7 +92,6 @@ namespace Refactoring.Tests
                 {
                     Person1 = new Person { Name = "Name2", DateOfBirth = new DateTime(2022,  6,  4) },
                     Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 10, 10) },
-                    DateOfBirthDifference = new DateTime(2022, 10, 10) - new DateTime(2022,  6,  4)
                 }
             },
             new object[] 
@@ -112,7 +110,6 @@ namespace Refactoring.Tests
                 {
                     Person1 = new Person { Name = "Name3", DateOfBirth = new DateTime(2022, 12, 31) },
                     Person2 = new Person { Name = "Name1", DateOfBirth = new DateTime(2022, 12, 31) },
-                    DateOfBirthDifference = TimeSpan.Zero
                 }
             },
             new object[] 
@@ -129,7 +126,6 @@ namespace Refactoring.Tests
                 {
                     Person1 = new Person { Name = "Name4", DateOfBirth = DateTime.MaxValue },
                     Person2 = new Person { Name = "Name2", DateOfBirth = DateTime.MaxValue },
-                    DateOfBirthDifference = TimeSpan.Zero
                 }
             }
         };

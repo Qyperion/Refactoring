@@ -1,4 +1,4 @@
-﻿namespace Refactoring
+﻿namespace Refactoring.Enums
 {
     public enum DateDifferenceType
     {
