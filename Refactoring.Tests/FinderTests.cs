@@ -12,7 +12,6 @@ namespace Refactoring.Tests
         [Theory]
         [MemberData(nameof(FinderTestData.PersonsWithMaxDateDifferenceType), MemberType = typeof(FinderTestData))]
         [MemberData(nameof(FinderTestData.PersonsWithMinDateDifferenceType), MemberType = typeof(FinderTestData))]
-        [MemberData(nameof(FinderTestData.PersonsWithLessThanTwoRecords), MemberType = typeof(FinderTestData))]
         public void TestPersonDatesFinder(DateDifferenceType dateDifferenceType, List<Person> persons, FinderResult<Person> expected)
         {
             // Arrange
@@ -23,9 +22,21 @@ namespace Refactoring.Tests
 
             // Assert
             Assert.Equal(expected, actual);
+            Assert.Equal(actual.DateDifference, actual.Element2.DateOfBirth - actual.Element1.DateOfBirth);
+        }
 
-            if (actual.Element1 != null && actual.Element2 != null)
-                Assert.Equal(actual.DateDifference, actual.Element2.DateOfBirth - actual.Element1.DateOfBirth);
+        [Theory]
+        [MemberData(nameof(FinderTestData.PersonsWithLessThanTwoRecords), MemberType = typeof(FinderTestData))]
+        public void TestPersonDatesFinder_WhenPersonsWithLessThanTwoRecords(DateDifferenceType dateDifferenceType, List<Person> persons, FinderResult<Person> expected)
+        {
+            // Arrange
+            var finder = new PersonDatesFinder(persons);
+
+            // Act
+            var actual = finder.Find(dateDifferenceType);
+
+            // Assert
+            Assert.Equal(expected, actual);
         }
 
         [Theory]

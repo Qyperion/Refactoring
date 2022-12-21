@@ -8,6 +8,11 @@ namespace Refactoring.Finders
 {
     public class DateExtremumPairFinder<T> where T : class, IDateProvider
     {
+        // Я би виніс List<T> elements з конструктора в параметр методу.
+        // Для існуючого функціонала Finder'у  не потрібний стан і його можна зробити статичним і використовувати як Singleton об'єкт.
+        // У такому випадку generic параметр <T> перейде з класу в метод Find.
+        // Але це змінить існуючий контракт, тому цього не роблю.
+
         private readonly List<T> _elements;
 
         protected DateExtremumPairFinder(List<T> elements)
@@ -84,23 +89,17 @@ namespace Refactoring.Finders
 
         private static FinderResult<T> FindPairWithMinDateDiff(IReadOnlyList<T> elements)
         {
-            TimeSpan minDateDiff = TimeSpan.MaxValue;
-            FinderResult<T> result = null;
+            FinderResult<T> resultWithMinDateDiff = new FinderResult<T>(elements[0], elements[1]);
 
-            for (int i = 0; i < elements.Count - 1; i++)
+            for (int i = 1; i < elements.Count - 1; i++)
             {
-                var currentElement = elements[i];
-                var nextElement = elements[i + 1];
-                var currentDateDiff = nextElement.GetDate() - currentElement.GetDate();
+                var currentResult = new FinderResult<T>(elements[i], elements[i + 1]);
 
-                if (currentDateDiff < minDateDiff)
-                {
-                    result = new FinderResult<T>(currentElement, nextElement);
-                    minDateDiff = currentDateDiff;
-                }
+                if (currentResult.DateDifference < resultWithMinDateDiff.DateDifference)
+                    resultWithMinDateDiff = currentResult;
             }
 
-            return result;
+            return resultWithMinDateDiff;
         }
 
         private static FinderResult<T> FindPairWithMaxDateDiff(IReadOnlyCollection<T> elements)

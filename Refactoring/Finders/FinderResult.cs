@@ -1,6 +1,7 @@
 ﻿using System;
+using Refactoring.Models;
 
-namespace Refactoring.Models
+namespace Refactoring.Finders
 {
     public record FinderResult<T> where T : IDateProvider
     {
